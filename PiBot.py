@@ -3,16 +3,16 @@ from pyvirtualdisplay import Display
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import time
-import InstagramBotLibrary as insta
+import PiInstagramBotLibrary as insta
 #Uncomment fo run without opening chrome window
 display = Display(visible=0,size=(800,600))
 display.start()
 
 #set up mobile emulation
-mobile_emulation = {"deviceName": "Google Nexus 5"}
-chrome_options = webdriver.ChromeOptions()
-chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
-driver = webdriver.Chrome(desired_capabilities = chrome_options.to_capabilities())
+#mobile_emulation = {"deviceName": "Google Nexus 5"}
+#chrome_options = webdriver.ChromeOptions()
+#chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
+#driver = webdriver.Chrome(desired_capabilities = chrome_options.to_capabilities())
 #set up an actionchain for general keypresses
 actions = ActionChains(driver)
 
