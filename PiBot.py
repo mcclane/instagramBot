@@ -14,6 +14,7 @@ display.start()
 #chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
 #driver = webdriver.Chrome(desired_capabilities = chrome_options.to_capabilities())
 #set up an actionchain for general keypresses
+driver = 
 actions = ActionChains(driver)
 
 username = input("enter username: ")

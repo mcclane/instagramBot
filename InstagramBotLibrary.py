@@ -2,11 +2,18 @@ import time
 import selenium
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
 import urllib.request
-import random
+from random import randint
+import logging
 
-delay = 15#seconds
+delay = 20#seconds
+c = open("compliment_words.txt", "r")
+cl = c.readlines()
+c.close()
+
+
 
 def login(driver,username,password):
     driver.get("https://www.instagram.com/accounts/login/")
@@ -54,11 +61,33 @@ def unfollow(driver,person):
             print("element not visible")
         except selenium.common.exceptions.StaleElementReferenceException:
             print("needs to load")
-
     print("unfollowed "+person)
-    return complete
+    return True
 
-def like_photo(driver, link=None):
+def unfollow_all(driver, logger, my_username, unfollow_limit):
+    unfollow_count = 0
+    while(True):
+        if(unfollow_count >= unfollow_limit):
+            break
+        driver.get("https://www.instagram.com/"+my_username)
+        time.sleep(2)
+        follow_page_link = driver.find_element_by_xpath("//*[contains(text(), 'following')]")
+        follow_page_link.click()
+        time.sleep(2)
+        unfollow_buttons = driver.find_elements_by_class_name("_ah57t")
+        for button in unfollow_buttons:
+            button.send_keys(Keys.ENTER)
+            unfollow_count += 1
+            time.sleep(10)
+            print("unfollowed someone")
+            driver.execute_script("window.scrollTo(0, "+str(52*unfollow_count)+");")
+
+def get_follow_num(driver, my_username):
+    driver.get("https://www.instagram.com/"+my_username)
+    time.sleep(2)
+    return int(driver.find_elements_by_class_name("_bkw5z")[2].text)
+    
+def like_photo(driver, logger, link=None):
     if(link is not None):
         driver.get(link)
     complete = False
@@ -66,10 +95,11 @@ def like_photo(driver, link=None):
         try:
             like_button = driver.find_element_by_class_name("_tk4ba")
             like_button.click()
-            complete = True
+            logger.info("liked "+driver.current_url)
+            return True
         except selenium.common.exceptions.NoSuchElementException:
             print("can't find like button!")
-            break
+            return False
         except selenium.common.exceptions.StaleElementReferenceException:
             print("needs to load")
             time.sleep(1)
@@ -83,14 +113,11 @@ def get_links_from_hashtag(driver,hashtag):
         pictures = driver.find_elements_by_class_name("_t5r8b")
         for pic in pictures:
             links.append(pic.get_attribute("href"))
-
     except selenium.common.exceptions.NoSuchElementException:
         print("couldn't find picture classes in tag "+hashtag+", returning empty list")
-    
     return links
 
-
-def follow_from_photo(driver,followed_dict,link=None):
+def follow_from_photo(driver, logger, followed_dict,link=None):
     if(link is not None):
         driver.get(link)
     time.sleep(delay)
@@ -100,7 +127,8 @@ def follow_from_photo(driver,followed_dict,link=None):
         if(follow_button.text == "Follow"):
             follow_button.click()
             followed_dict[username] = ""
-            print("followed "+username)
+            logger.info("followed "+username)
+            #print("followed "+username)
             time.sleep(1)
             return True
         else:
@@ -108,17 +136,35 @@ def follow_from_photo(driver,followed_dict,link=None):
     except selenium.common.exceptions.NoSuchElementException:
         print("couldn't find follow button")
         return False
+
+def comment(driver, logger, link=None):
+    if(link is not None):
+        driver.get(link)
+    try:
+        comment_sprite = driver.find_element_by_class_name("coreSpriteComment")
+        comment_sprite.click()
+        text_box = driver.find_element_by_class_name("_2hc0g")
+        comment = "You are so "+cl[randint(0,len(cl)-1)].strip()+"!"  
+        text_box.send_keys(comment)
+        time.sleep(1)
+        text_box.send_keys(Keys.ENTER)
+        logger.info("commented "+comment+" on "+driver.current_url)
+        time.sleep(1)
+        return True
+    except selenium.common.exceptions.NoSuchElementException:
+        return False
     
-def follow_and_like_from_hashtag(driver,hashtag,followed_dict):
+def follow_and_like_from_hashtag(driver, logger, hashtag,followed_dict):
     links = get_links_from_hashtag(driver,hashtag)
     for link in links:
         driver.get(link)
-        time.sleep(2)
-        like_photo(driver)
         time.sleep(1)
-        follow_from_photo(driver,followed_dict)
+        follow_from_photo(driver, logger, followed_dict)
+        time.sleep(2)
+        like_photo(driver, logger)
+        time.sleep(1)
+        comment(driver, logger)
         time.sleep(delay)
-
 
 def follow_from_hashtag(driver,hashtag,followed_dict):
     links = []
