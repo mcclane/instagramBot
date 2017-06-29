@@ -52,8 +52,10 @@ def do_the_follow():
     hashtags = ["followback","custom","lfl","followers","hot","model","modifikasi","modify","path","Ill","racing","flf","likeforfollow","l4l","poto","cantik","sexy","hits","fff","kekinian","indonesia","motomorning","lizakoshy","lizzzak","lizzza","comedy","videos","vids","pics","pictures","love","instagood","photooftheday","tbt","beautiful","cute","me","happy","fashion","followme","follow","selfie","picoftheday","summer","friends","instadaily","girl","fun","tagsforlikes","smile","repost","igers","instalike","food","art","family","nature","likeforlike","style","nofilter","teamfollowback","lfl","likeback","likeforlike","f4f","follow4follow","followback","like4follow","follow","like4like","instalike","followforfollow","l4l"]
 
     followed_dict = {} # ***Tries**** to keep track of who the bot has followed so it can unfollow them
-    for i in range(0,len(hashtags)):
-        insta.follow_and_like_from_hashtag(driver, logger, hashtags[i], followed_dict)
+    for tag in hashtags:
+        logger.info("hashtag: "+tag)
+        insta.follow_and_like_from_hashtag(driver, logger, tag, followed_dict)
+
 
 
 
