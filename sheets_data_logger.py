@@ -1,44 +1,37 @@
-from google_sheets import *
-from InstagramBotLibrary import *
-
-from selenium import webdriver
-from pyvirtualdisplay import Display
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
+import requests
+import re
 import time
-import sys
 
-from InstagramBotLibrary import *
+from google_sheets import *
+from my_logger import *
 
-#Uncomment fo run without opening chrome window
-display = Display(visible=0,size=(800,600))
-display.start()
+#get rid of annoying log message from requests library
+import logging
+logging.getLogger("requests").setLevel(logging.WARNING)
 
-#set up mobile emulation
-mobile_emulation = {"deviceName": "Apple iPhone 6"}
-chrome_options = webdriver.ChromeOptions()
-chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
-driver = webdriver.Chrome(desired_capabilities = chrome_options.to_capabilities())
-#set up an actionchain for general keypresses
-
-username = input("enter username: ")
-password = input("enter password: ")
-
-login(driver, username, password)
 
 upload_counter = 1
 data = []
 while(True):
-    following_count = get_follow_num(driver, username)
-    followers_count = get_follower_count(driver, username)
-    data.append([time.time(), followers_count, following_count])
+    try:
+        r = requests.get("https://www.instagram.com/mcclane.howland")
+        text = r.text
+        regex = '"followed_by": {"count": (\d+)}'
+        followers = re.search(regex, text).group(1)
+        regex = '"follows": {"count": (\d+)}'
+        following = re.search(regex, text).group(1)
+        data.append([time.time(), followers, following])
+    except Exception:
+        log_message("error", "exception in sheets_data_logger.py")
+        pass
 
-    if(upload_counter%10 == 0):
+    if(upload_counter%50 == 0):
         upload(data)
         data = []
-        print("uploaded some data!")
+        log_message("info", "uploaded some data to google sheets")
 
     upload_counter += 1
+    time.sleep(2)
 
      
 

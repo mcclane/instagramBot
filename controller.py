@@ -22,7 +22,7 @@ actions = ActionChains(driver)
 
 #some constants
 initial_followcount = 371
-hashtags = ["followback","custom","lfl","followers","hot","model","modifikasi","modify","path","Ill","racing","flf","likeforfollow","l4l","poto","cantik","sexy","hits","fff","kekinian","indonesia","motomorning","lizakoshy","lizzzak","lizzza","comedy","videos","vids","pics","pictures","love","instagood","photooftheday","tbt","beautiful","cute","me","happy","fashion","followme","follow","selfie","picoftheday","summer","friends","instadaily","girl","fun","tagsforlikes","smile","repost","igers","instalike","food","art","family","nature","likeforlike","style","nofilter","teamfollowback","lfl","likeback","likeforlike","f4f","follow4follow","followback","like4follow","follow","like4like","instalike","followforfollow","l4l"]
+hashtags = ["followback","custom","lfl","followers","hot","model","modifikasi","modify","path","ill","racing","flf","likeforfollow","l4l","poto","cantik","sexy","hits","fff","kekinian","indonesia","motomorning","lizakoshy","lizzzak","lizzza","comedy","videos","vids","pics","pictures","love","instagood","photooftheday","tbt","beautiful","cute","me","happy","fashion","followme","follow","selfie","picoftheday","summer","friends","instadaily","girl","fun","tagsforlikes","smile","repost","igers","instalike","food","art","family","nature","likeforlike","style","nofilter","teamfollowback","lfl","likeback","likeforlike","f4f","follow4follow","followback","like4follow","follow","like4like","instalike","followforfollow","l4l"]
 
 #get the username/password
 username = input("enter username: ")

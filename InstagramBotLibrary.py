@@ -8,7 +8,7 @@ import urllib.request
 from random import randint
 from my_logger import *
 
-delay = 15#seconds
+delay = 10#seconds
 
 #get the words for generating comments 
 c = open("compliment_words.txt", "r")
@@ -102,12 +102,12 @@ def unfollow_all(driver, my_username, unfollow_limit): #(unfollow_limit) persons
 def get_follow_num(driver, my_username): #scrape how many people I follow
     driver.get("https://www.instagram.com/"+my_username)
     time.sleep(3)
-    return int(driver.find_elements_by_class_name("_bkw5z")[2].text)
+    return driver.find_elements_by_class_name("_bkw5z")[2].text
 
 def get_follower_count(driver, my_username): #scrape how many people I follow
     driver.get("https://www.instagram.com/"+my_username)
     time.sleep(3)
-    return int(driver.find_elements_by_class_name("_bkw5z")[1].text)
+    return driver.find_elements_by_class_name("_bkw5z")[1].text
    
 def like_photo(driver, link=None): 
     if(link is not None):
@@ -125,6 +125,9 @@ def like_photo(driver, link=None):
         except selenium.common.exceptions.StaleElementReferenceException:
             print("needs to load")
             time.sleep(1)
+        except selenium.common.exceptions.WebDriverException:
+            print("can't click on like button")
+            return False
 
 def get_links_from_hashtag(driver, hashtag): #scrape photo links from a hashtag
     links = []
@@ -132,9 +135,13 @@ def get_links_from_hashtag(driver, hashtag): #scrape photo links from a hashtag
     driver.get(url)
     time.sleep(delay)
     try:
-        pictures = driver.find_elements_by_class_name("_t5r8b")
+        pictures= driver.find_elements_by_xpath("//a[@href]")
+        
         for pic in pictures:
-            links.append(pic.get_attribute("href"))
+            link = pic.get_attribute("href")
+            if("javascript" not in link):
+                links.append(pic.get_attribute("href"))
+
     except selenium.common.exceptions.NoSuchElementException:
         log_message("error", "couldn't find picture classes in tag "+hashtag+", returning empty list")
     return links
@@ -165,9 +172,7 @@ def comment(driver, link=None):
         time.sleep(1)
         text_box = driver.find_element_by_class_name("_2hc0g")
         comment = generate_comment() 
-        for char in comment:
-            text_box.send_keys(comment)
-            time.sleep(0.1)
+        text_box.send_keys(comment)
         time.sleep(1)
         text_box.send_keys(Keys.ENTER)
         log_message("info", "commented "+comment+" on "+driver.current_url)
@@ -182,12 +187,12 @@ def follow_and_like_from_hashtag(driver, hashtag):
     for link in links:
         driver.get(link)
         time.sleep(1)
-        follow_from_photo(driver)
-        time.sleep(2)
+        #follow_from_photo(driver)
+        #time.sleep(2)
         like_photo(driver)
         if(i%5 == 0):
             time.sleep(1)
-            #comment(driver)
+            comment(driver)
         time.sleep(delay)
         i += 1
 
@@ -197,6 +202,7 @@ def generate_comment():
     v1 = vl[randint(0,len(vl)-1)].strip()
     c1 = cl[randint(0,len(cl)-1)].strip()
     user = shoutout_users[randint(0,len(shoutout_users)-1)]
-    return "The "+n1+"s "+v1+" the "+n2+". You are so "+c1+"! @"+user
+    #return "The "+n1+"s "+v1+" the "+n2+". You are so "+c1+"! @"+user
+    return "You are so "+c1+"!"
 
 
