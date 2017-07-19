@@ -4,9 +4,11 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 import sys
+import random
 
 from my_logger import *
 from InstagramBotLibrary import *
+from get_follow_counts import *
 
 #Uncomment fo run without opening chrome window
 display = Display(visible=0,size=(800,600))
@@ -21,9 +23,9 @@ driver = webdriver.Chrome(desired_capabilities = chrome_options.to_capabilities(
 actions = ActionChains(driver)
 
 #some constants
-initial_followcount = 371
-hashtags = ["followback","custom","lfl","followers","hot","model","modifikasi","modify","path","ill","racing","flf","likeforfollow","l4l","poto","cantik","sexy","hits","fff","kekinian","indonesia","motomorning","lizakoshy","lizzzak","lizzza","comedy","videos","vids","pics","pictures","love","instagood","photooftheday","tbt","beautiful","cute","me","happy","fashion","followme","follow","selfie","picoftheday","summer","friends","instadaily","girl","fun","tagsforlikes","smile","repost","igers","instalike","food","art","family","nature","likeforlike","style","nofilter","teamfollowback","lfl","likeback","likeforlike","f4f","follow4follow","followback","like4follow","follow","like4like","instalike","followforfollow","l4l"]
-
+initial_followcount = 252
+hashtags = open("hashtags.txt", "r").readlines()
+randint(0,len(hashtags)-1)
 #get the username/password
 username = input("enter username: ")
 password = input("enter password: ")
@@ -37,8 +39,8 @@ time.sleep(2)
 ActionChains(driver).send_keys(Keys.ESCAPE)
 
 def do_the_unfollow():
-    follow_num = get_follow_num(driver, username)
-    unfollow_limit = follow_num - initial_followcount
+    following = get_following(username)
+    unfollow_limit = following - initial_followcount
     unfollow_all(driver, username, unfollow_limit)  
 
 def do_the_follow():
@@ -48,10 +50,12 @@ def do_the_follow():
 
 def do_both():
     while(True):
-        for i in range(0,len(hashtags)):
-            log_message("info", "hashtag: "+hashtags[i])
-            follow_and_like_from_hashtag(driver, hashtags[i])
-            if(i%10 == 0):
+        for i in range(0,50):
+            hashtag = hashtags[randint(0,len(hashtags)-1)]
+            log_message("info", "hashtag: "+hashtag)
+            follow_and_like_from_hashtag(driver, hashtag)
+            if(i%50 == 0):
+                do_the_unfollow()
                 do_the_unfollow()
 
 #read in the args and decide what to do
@@ -59,12 +63,10 @@ if(len(sys.argv) > 1):
     if(sys.argv[1] == "follow"):
         do_the_follow()
     elif(sys.argv[1] == "unfollow"):
-        do_the_unfollow()
+        for i in range(20):
+            do_the_unfollow()
     else:
-        print("invalid you idiot")
+        log_message("error", "invalid you idiot")
 else:
-    print("enter follow or unfollow argument fool, I'm just gonna go forever now")
+    log_message("info", "enter follow or unfollow argument fool, I'm just gonna go forever now")
     do_both()
-
-
-

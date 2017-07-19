@@ -8,7 +8,7 @@ import urllib.request
 from random import randint
 from my_logger import *
 
-delay = 10#seconds
+delay = 15#seconds
 
 #get the words for generating comments 
 c = open("compliment_words.txt", "r")
@@ -187,10 +187,10 @@ def follow_and_like_from_hashtag(driver, hashtag):
     for link in links:
         driver.get(link)
         time.sleep(1)
-        #follow_from_photo(driver)
-        #time.sleep(2)
+        follow_from_photo(driver)
+        time.sleep(2)
         like_photo(driver)
-        if(i%5 == 0):
+        if(i%15 == 0):
             time.sleep(1)
             comment(driver)
         time.sleep(delay)
