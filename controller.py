@@ -6,8 +6,8 @@ import time
 ###################
 ## Constants
 ###################
-DELAY = 60
-PIPE_DEPTH = 100
+DELAY = 120
+PIPE_DEPTH = 200
 HOW_MANY_TAGS = 1000
 
 #####################
@@ -19,6 +19,7 @@ csl = cs.readlines()
 hl = h.readlines()
 cs.close()
 h.close()
+
 
 ###################
 ## Create the bot
@@ -35,10 +36,13 @@ for i in range(HOW_MANY_TAGS):
     #iterate through, like all and comment on a few
     for i in range(len(media)):
         b.like(media[i]['id'])
+        time.sleep(1)
         if(i == len(media)/2):
             b.comment(csl[randint(0, len(csl)-1)], media[i]['id'])
-        b.follow(media[i]['owner']['id'])
-        followed_list.append(media[i]['owner']['id'])
+            time.sleep(1)
+        #b.follow(media[i]['owner']['id'])
+        time.sleep(1)
+        #followed_list.append(media[i]['owner']['id'])
         if(len(followed_list) > PIPE_DEPTH):
             b.unfollow(followed_list[0])
             followed_list.pop(0)
