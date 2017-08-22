@@ -3,37 +3,16 @@ from getpass import getpass
 from random import randint
 import time
 
-def run_bot(delay, pipe_depth, number_of_tags, compliments, hashtags):
-    print("delay:", delay)
-
-    # Create the bot
-    b = Bot(input("USERNAME: "), getpass("PASSWORD: "))
-    time.sleep(2)
-    followed_list = []
-    for i in range(number_of_tags):
-        #get the media for a random hashtag
-        tag = hashtags[randint(0,len(hashtags)-1)].strip()
-        media = b.get_media_from_hashtag(tag)
-        #iterate through, like all and comment on a few
-        for i in range(len(media)):
-            b.like(media[i]['id'])
-            time.sleep(1)
-            if(i == len(media)/2):
-                b.comment(compliments[randint(0, len(compliments)-1)], media[i]['id'])
-                time.sleep(1)
-            #b.follow(media[i]['owner']['id'])
-            time.sleep(1)
-            #followed_list.append(media[i]['owner']['id'])
-            if(len(followed_list) > pipe_depth):
-                b.unfollow(followed_list[0])
-                followed_list.pop(0)
-            # TODO: should make delay random?
-            time.sleep(delay)
-
-    #clean up
-    for user in followed_list:
-        b.unfollow(user)
-
+'''
+Main runner class that reads in flags and starts the bot. All flags optional:
+    Sample Invocation:
+        python3 controller.py  --hashtag_type=surfing --number_of_tags=20
+    All arguments:
+        hashtag_type : grouping of hashtags to randomly visit posts from
+        delay : time (rough) between each bot action
+        pipe_depth : maximum number of account should follow
+        number_of_tags : number of hashtags bot will exhaustively visit
+'''
 def main():
     import argparse
     parser = argparse.ArgumentParser()
@@ -61,6 +40,35 @@ def main():
 
     print("starting pipeline")
     run_bot(args.delay, args.pipe_depth, args.number_of_tags, compliments, hashtags)
+
+def run_bot(delay, pipe_depth, number_of_tags, compliments, hashtags):
+    # Create the bot
+    b = Bot(input("USERNAME: "), getpass("PASSWORD: "))
+    time.sleep(2)
+    followed_list = []
+    for i in range(number_of_tags):
+        #get the media for a random hashtag
+        tag = hashtags[randint(0,len(hashtags)-1)].strip()
+        media = b.get_media_from_hashtag(tag)
+        #iterate through, like all and comment on a few
+        for i in range(len(media)):
+            b.like(media[i]['id'])
+            time.sleep(1)
+            if(i == len(media)/2):
+                b.comment(compliments[randint(0, len(compliments)-1)], media[i]['id'])
+                time.sleep(1)
+            #b.follow(media[i]['owner']['id'])
+            time.sleep(1)
+            #followed_list.append(media[i]['owner']['id'])
+            if(len(followed_list) > pipe_depth):
+                b.unfollow(followed_list[0])
+                followed_list.pop(0)
+            # TODO: should make delay random?
+            time.sleep(delay)
+
+    #clean up
+    for user in followed_list:
+        b.unfollow(user)
 
 if __name__ == '__main__':
     main()
