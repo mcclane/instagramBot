@@ -6,7 +6,7 @@ import re
 import json
 
 #my files
-from logger import logger
+from logger import logger_2
 
 #Session settings
 DEVICE_SETTINGS = {
@@ -32,15 +32,12 @@ class Bot(object):
         self.password = password
         #create a requests session to save cookies
         self.s = requests.Session()
-        #logfile
-        self.logfile = logger("logs/%s.log"%(self.username.replace(".","")))
-        self.logfile.write("hello")
+        self.logger = logger_2(self.username)
+        self.logger.log_login("attempt")
         self.login()
-        
+
     def login(self):
         #try to log in
-        self.logfile.write("%d: Trying to log in as %s...\n" % (time.time(), self.username))
-        print("%d: Trying to log in as %s..." % (time.time(), self.username))
         self.s.cookies.update({
             'sessionid': '',
             'mid': '',
@@ -78,37 +75,30 @@ class Bot(object):
             r = self.s.get("https://www.instagram.com/")
             finder = r.text.find(self.username)
             if(finder != -1):
-                self.logfile.write("%d: apparently this was a success\n" % (time.time()))
-                print("apparently this was a success")
+                self.logger.log_login("success")
             else:
-                self.logfile.write("%d: I can't find the username in the response text\n" % (time.time()))
-                print("I can't find the username in the response text")
+                self.logger.log_login("auth_unsuccessful")
                 sys.exit()
         else:
-            self.logfile.write("%d: response code was %d\n" % (time.time(), login.status.code))
-            print("%d: response code was %d" % (time.time(), login.status.code))
+            self.logger.log_login(self.username, "auth_error:%d"%login.status.code)
             sys.exit()
 
     def follow(self, user_id):
         follow = self.s.post(FOLLOW_URL % (user_id))
-        self.logfile.write("%d: Followed %s response: %s\n" % (time.time(), user_id, follow.text))
-        print("%d: Followed %s response: %s" % (time.time(), user_id, follow.text))
-    
+        self.logger.log_follow("follow", user_id, follow.text)
+
     def unfollow(self, user_id):
         unfollow = self.s.post(UNFOLLOW_URL % (user_id))
-        self.logfile.write("%d: Unfollowed %s response: %s\n" % (time.time(), user_id, unfollow.text))
-        print("%d: Unfollowed %s response: %s" % (time.time(), user_id, unfollow.text))
+        self.logger.log_follow("unfollow", user_id, unfollow.text)
 
     def like(self, media_id):
         like = self.s.post(LIKE_URL % (media_id))
-        self.logfile.write("%d: liked %s response: %s\n" % (time.time(), media_id, like.text))
-        print("%d: liked %s response: %s" % (time.time(), media_id, like.text))
+        self.logger.log_like("like_photo", media_id, like.text);
 
     def comment(self, comment_text, media_id):
         comment = self.s.post(COMMENT_URL % (media_id), data={"comment_text":comment_text})
-        self.logfile.write("%d: Commented %s on %s response: %s\n" %(time.time(), comment_text, media_id, comment.text))
-        print("%d: Commented %s on %s response: %s" %(time.time(), comment_text, media_id, comment.text))
-        
+        self.logger.log_comment("write_comment", media_id, comment.text)
+
     def get_media_from_hashtag(self, hashtag):
         #scrape a hashtag for a list of media dicts. Keys I need to know: 'id' 'owner':'id'
         hashtag = self.s.post(HASHTAG_URL % (hashtag))
