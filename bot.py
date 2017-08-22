@@ -6,7 +6,6 @@ import re
 import json
 
 #my files
-from logger import logger
 from logger import logger_2
 
 #Session settings
@@ -33,10 +32,6 @@ class Bot(object):
         self.password = password
         #create a requests session to save cookies
         self.s = requests.Session()
-        #logfile
-        self.logfile = logger("logs/%s.log"%(self.username.replace(".","")))
-        # Todo: delete
-        self.logfile.write("hello")
         self.logger = logger_2(self.username)
         self.logger.log_login("attempt")
         self.login()
@@ -94,20 +89,15 @@ class Bot(object):
 
     def unfollow(self, user_id):
         unfollow = self.s.post(UNFOLLOW_URL % (user_id))
-        self.logger.log_follow("unfollow", user_id, follow.text)
-        # TODO: delete
-        self.logfile.write("%d: Unfollowed %s response: %s\n" % (time.time(), user_id, unfollow.text))
-        print("%d: Unfollowed %s response: %s" % (time.time(), user_id, unfollow.text))
+        self.logger.log_follow("unfollow", user_id, unfollow.text)
 
     def like(self, media_id):
         like = self.s.post(LIKE_URL % (media_id))
-        self.logfile.write("%d: liked %s response: %s\n" % (time.time(), media_id, like.text))
-        print("%d: liked %s response: %s" % (time.time(), media_id, like.text))
+        self.logger.log_like("like_photo", media_id, like.text);
 
     def comment(self, comment_text, media_id):
         comment = self.s.post(COMMENT_URL % (media_id), data={"comment_text":comment_text})
-        self.logfile.write("%d: Commented %s on %s response: %s\n" %(time.time(), comment_text, media_id, comment.text))
-        print("%d: Commented %s on %s response: %s" %(time.time(), comment_text, media_id, comment.text))
+        self.logger.log_comment("write_comment", media_id, comment.text)
 
     def get_media_from_hashtag(self, hashtag):
         #scrape a hashtag for a list of media dicts. Keys I need to know: 'id' 'owner':'id'

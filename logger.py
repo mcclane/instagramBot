@@ -3,14 +3,6 @@ import numpy as np
 import os
 import pandas as pd
 
-class logger:
-    def __init__(self, name):
-        self.name = name
-    def write(self, message):
-        f = open(self.name, "a")
-        f.write("%d: %s" % (time.time(), message))
-        f.close()
-
 class logger_2:
     # TODO: add optional print flag (should print formatted messages)
     # TODO: move follow & unfollow strings to constants in this file
@@ -19,11 +11,17 @@ class logger_2:
         self.verbose = verbose
         self.base_path = "logs/%s/"%(username.replace(".",""))
 
+        # Set pandas index's for each log
         self.login_log_index = ['time', 'message']
-        self.login_log_path = self.base_path + "login_log.pkl"
-
         self.follow_log_index = ['time', 'relationship_change', 'user_id', 'follow_text']
+        self.like_log_index = ['time', 'like_change', 'media_id', 'like_text']
+        self.comment_log_index = ['time', 'comment_change', 'media_id', 'comment_text']
+
+        # Set base paths for each log
+        self.login_log_path = self.base_path + "login_log.pkl"
         self.follow_log_path = self.base_path + "follow_log.pkl"
+        self.like_log_path = self.base_path + 'like_log.pkl'
+        self.comment_log_path = self.base_path + 'comment_log.pkl'
 
     def log_login(self, message):
         entry = [time.time(), message]
@@ -32,6 +30,14 @@ class logger_2:
     def log_follow(self, relationship_change, user_id, follow_text):
         entry = [time.time(), relationship_change, user_id, follow_text]
         self.add_and_save(self.follow_log_path, entry, self.follow_log_index)
+
+    def log_like(self, like_change, media_id, like_text):
+        entry = [time.time(), like_change, media_id, like_text]
+        self.add_and_save(self.like_log_path, entry, self.like_log_index)
+
+    def log_comment(self, comment_change, media_id, comment_text):
+        entry = [time.time(), comment_change, media_id, comment_text]
+        self.add_and_save(self.comment_log_path, entry, self.comment_log_index)
 
     def add_and_save(self, path, data, index):
         if self.verbose:
@@ -44,6 +50,7 @@ class logger_2:
         save_dataset(path, dataset)
 
     def format_print(self, data, index):
+        # TODO: add formatting for other log types
         if index == self.follow_log_index:
             time = data[0]
             relationship_change = data[1]
