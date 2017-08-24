@@ -23,6 +23,8 @@ def main():
     parser.add_argument('--pipe_depth', type=int, default=200)
     parser.add_argument('--number_of_tags', type=int, default=1000)
     parser.add_argument('--cycle', type=int, default=None)
+    parser.add_argument('--username', type=str, default=None)
+    parser.add_argument('--password', type=str, default=None)
     args = parser.parse_args()
 
     # Get the resources
@@ -30,6 +32,12 @@ def main():
     compliments = cs.readlines()
     cs.close()
 
+    #username/password
+    if(args.username == None): username = input("Username: ")
+    else: username = args.username
+    if(args.password == None): password = getpass()
+    else: password = args.password
+    #hashtag list
     if args.hashtag_type == 'big_list':
         h = open("resources/hashtags.txt", "r")
     elif args.hashtag_type == 'surfing':
@@ -44,14 +52,14 @@ def main():
 
     if(args.cycle != None):
         print("starting cycle")
-        run_cycle(args.delay, args.cycle, compliments, hashtags)
+        run_cycle(username, password, args.delay, args.cycle, compliments, hashtags)
     else:
         print("starting pipeline")
-        run_bot(args.delay, args.pipe_depth, args.number_of_tags, compliments, hashtags)
+        run_bot(username, password, args.delay, args.pipe_depth, args.number_of_tags, compliments, hashtags)
 
-def run_bot(delay, pipe_depth, number_of_tags, compliments, hashtags):
+def run_bot(username, password, delay, pipe_depth, number_of_tags, compliments, hashtags):
     # Create the bot
-    b = Bot(input("USERNAME: "), getpass("PASSWORD: "))
+    b = Bot(username, password)
     time.sleep(2)
     followed_list = []
     for i in range(number_of_tags):
@@ -83,9 +91,9 @@ def run_bot(delay, pipe_depth, number_of_tags, compliments, hashtags):
     for user in followed_list:
         b.unfollow(user)
 
-def run_cycle(delay, cycle_length, compliments, hashtags):
+def run_cycle(username, password, delay, cycle_length, compliments, hashtags):
     # Create the bot
-    b = Bot(input("USERNAME: "), getpass("PASSWORD: "))
+    b = Bot(username, password)
     time.sleep(2)
     followed_list = []
     for i in range(cycle_length):
