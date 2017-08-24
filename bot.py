@@ -73,6 +73,7 @@ class Bot(object):
         time.sleep(5 * random.random())
         if(login.status_code == 200):
             r = self.s.get("https://www.instagram.com/")
+            self.id = re.search("\"id\": \"(\d+)\"", r.text).group(1)
             finder = r.text.find(self.username)
             if(finder != -1):
                 self.logger.log_login("success")
