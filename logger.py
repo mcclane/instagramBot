@@ -54,7 +54,8 @@ class logger_2:
         if index == self.follow_log_index:
             time = data[0]
             relationship_change = data[1]
-            print("%s at time: %d"%(relationship_change, time))
+            user_id = data[2]
+            print("%s: %s at time: %d user: %s"%(self.username, relationship_change, time, user_id))
         else:
             print(data)
 
