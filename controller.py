@@ -12,6 +12,7 @@ Main runner class that reads in flags and starts the bot. All flags optional:
         delay : time (rough) between each bot action
         pipe_depth : maximum number of account should follow
         number_of_tags : number of hashtags bot will exhaustively visit
+        cycle: follow number of users passed in, then unfollow them all
 '''
 def main():
     import argparse
@@ -60,7 +61,7 @@ def run_bot(delay, pipe_depth, number_of_tags, compliments, hashtags):
             media = b.get_media_from_hashtag(tag)
             #iterate through, like all and comment on a few
             for i in range(len(media)):
-                b.like(media[i]['id'])
+                #b.like(media[i]['id'])
                 time.sleep(1)
                 if(i == len(media)/2):
                     b.comment(compliments[randint(0, len(compliments)-1)], media[i]['id'])
@@ -94,7 +95,7 @@ def run_cycle(delay, cycle_length, compliments, hashtags):
             media = b.get_media_from_hashtag(tag)
             #iterate through, like all and comment on a few
             for i in range(len(media)):
-                b.like(media[i]['id'])
+                #b.like(media[i]['id'])
                 time.sleep(1)
                 if(i == len(media)/2):
                     b.comment(compliments[randint(0, len(compliments)-1)], media[i]['id'])
