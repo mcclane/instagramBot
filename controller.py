@@ -1,4 +1,5 @@
 from bot import Bot
+import follower_accounting as fa
 from getpass import getpass
 from random import randint
 import time
@@ -13,6 +14,8 @@ Main runner class that reads in flags and starts the bot. All flags optional:
         pipe_depth : maximum number of account should follow
         number_of_tags : number of hashtags bot will exhaustively visit
         cycle: follow number of users passed in, then unfollow them all
+        username: username, if not passed in ask for user input
+        password: password, if not passed in ask for user input
 '''
 def main():
     import argparse
@@ -25,6 +28,7 @@ def main():
     parser.add_argument('--cycle', type=int, default=None)
     parser.add_argument('--username', type=str, default=None)
     parser.add_argument('--password', type=str, default=None)
+    parser.add_argument('--clean', action='store_true')
     args = parser.parse_args()
 
     # Get the resources
@@ -53,6 +57,9 @@ def main():
     if(args.cycle != None):
         print("starting cycle")
         run_cycle(username, password, args.delay, args.cycle, compliments, hashtags)
+    elif(args.clean):
+        print("starting clean")
+        clean(username, password, args.delay)
     else:
         print("starting pipeline")
         run_bot(username, password, args.delay, args.pipe_depth, args.number_of_tags, compliments, hashtags)
@@ -69,7 +76,7 @@ def run_bot(username, password, delay, pipe_depth, number_of_tags, compliments, 
             media = b.get_media_from_hashtag(tag)
             #iterate through, like all and comment on a few
             for i in range(len(media)):
-                #b.like(media[i]['id'])
+                b.like(media[i]['id'])
                 time.sleep(1)
                 if(i == len(media)/2):
                     b.comment(compliments[randint(0, len(compliments)-1)], media[i]['id'])
@@ -96,7 +103,8 @@ def run_cycle(username, password, delay, cycle_length, compliments, hashtags):
     b = Bot(username, password)
     time.sleep(2)
     followed_list = []
-    for i in range(cycle_length):
+    #follow people
+    while(len(followed_list) < cycle_length):
         try:
             #get the media for a random hashtag
             tag = hashtags[randint(0,len(hashtags)-1)].strip()
@@ -112,17 +120,34 @@ def run_cycle(username, password, delay, cycle_length, compliments, hashtags):
                 time.sleep(1)
                 followed_list.append(media[i]['owner']['id'])
                 time.sleep(randint(delay-5,delay+5))
+                if(len(followed_list) > cycle_length):
+                    break
+            if(len(followed_list) > cycle_length):
+                break
         except Exception as e:
             print(str(e))
             time.sleep(delay)
 
     #clean up
-    for user in followed_list:
-        try:
-            b.unfollow(user)
-            time.sleep(randint(delay-5, delay+5))
-        except Exception as e:
-            print(str(e))
+    clean(username, password, delay, b)
+    #for user in followed_list:
+    #    try:
+    #        b.unfollow(user)
+    #        time.sleep(randint(delay-5, delay+5))
+    #    except Exception as e:
+    #        print(str(e))
+
+def clean(username, password, delay, b=None):
+    if(b==None):
+        b = Bot(username, password)
+    time.sleep(2)
+
+    open_followings = fa.follower_analysis(username)['open_followings']
+
+    for user in open_followings:
+        b.unfollow(user)
+        time.sleep(abs(randint(delay-5, delay+5)))
+
 
 if __name__ == '__main__':
     main()
