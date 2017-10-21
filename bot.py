@@ -25,6 +25,7 @@ INBOX_URL = "https://www.instagram.com/direct_v2/inbox/"
 HASHTAG_URL = "https://www.instagram.com/explore/tags/%s/?__a=1"
 LIKE_URL = "https://www.instagram.com/web/likes/%s/like/"
 COMMENT_URL = "https://www.instagram.com/web/comments/%s/add/"
+FOLLOWING_URL = "https://www.instagram.com/graphql/query/"
 
 class Bot(object):
     def __init__(self, username, password):
@@ -104,3 +105,21 @@ class Bot(object):
         #scrape a hashtag for a list of media dicts. Keys I need to know: 'id' 'owner':'id'
         hashtag = self.s.post(HASHTAG_URL % (hashtag))
         return json.loads(hashtag.text)['tag']['media']['nodes']
+
+    #not done and only works for tlanews account because of id right now
+    def get_following(self):
+        data = {
+            'query_id': 17874545323001329,
+            'variables': "{\"id\":\"6116209680\",\"first\":1985}",
+        }
+        req = self.s.post(FOLLOWING_URL, data=data)
+        f = open("following_list_json.txt", "w")
+        f.write(req.text)
+        return req.text
+
+    #not done and only works for me
+    def unfollow_bulk(self):
+        with open("id_list.txt") as f:
+            for line in f.readlines():
+                self.unfollow(int(line.strip()))
+                time.sleep(65)
