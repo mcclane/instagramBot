@@ -29,6 +29,7 @@ def main():
     parser.add_argument('--username', type=str, default=None)
     parser.add_argument('--password', type=str, default=None)
     parser.add_argument('--clean', action='store_true')
+    parser.add_argument('--mass_unfollow', type=int, default=-1)
     args = parser.parse_args()
 
     # Get the resources
@@ -50,11 +51,14 @@ def main():
         h = open("resources/travel_hashtags.txt", "r")
     else:
         raise ValueError('Argument hashtag_type %s invalid.'%args.hashtag_type)
-
     hashtags = h.readlines()
     h.close()
-
-    if(args.cycle != None):
+    
+    #what the bot will do
+    if(args.mass_unfollow != -1):
+        print("Starting mass unfollow")
+        mass_unfollow(username, password, args.mass_unfollow)
+    elif(args.cycle != None):
         print("starting cycle")
         run_cycle(username, password, args.delay, args.cycle, compliments, hashtags)
     elif(args.clean):
@@ -130,12 +134,6 @@ def run_cycle(username, password, delay, cycle_length, compliments, hashtags):
 
     #clean up
     clean(username, password, delay, b)
-    #for user in followed_list:
-    #    try:
-    #        b.unfollow(user)
-    #        time.sleep(randint(delay-5, delay+5))
-    #    except Exception as e:
-    #        print(str(e))
 
 def clean(username, password, delay, b=None):
     if(b==None):
@@ -147,6 +145,10 @@ def clean(username, password, delay, b=None):
     for user in open_followings:
         b.unfollow(user)
         time.sleep(abs(randint(delay-5, delay+5)))
+
+def mass_unfollow(username, password, n):
+    b = Bot(username, password)
+    b.mass_unfollow(n)
 
 
 if __name__ == '__main__':

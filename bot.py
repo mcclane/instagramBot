@@ -106,20 +106,16 @@ class Bot(object):
         hashtag = self.s.post(HASHTAG_URL % (hashtag))
         return json.loads(hashtag.text)['tag']['media']['nodes']
 
-    #not done and only works for tlanews account because of id right now
-    def get_following(self):
+    def get_following(self, id_, n):
         data = {
-            'query_id': 17874545323001329,
-            'variables': "{\"id\":\"6116209680\",\"first\":1985}",
+            'query_id': 17874545323001329, # This query ID seems to be valid for getting following for any user, don't know why
+            'variables': "{\"id\":\"%s\",\"first\":%s}" % (id_, n),
         }
         req = self.s.post(FOLLOWING_URL, data=data)
-        f = open("following_list_json.txt", "w")
-        f.write(req.text)
         return req.text
 
-    #not done and only works for me
-    def unfollow_bulk(self):
-        with open("id_list.txt") as f:
-            for line in f.readlines():
-                self.unfollow(int(line.strip()))
-                time.sleep(65)
+    def mass_unfollow(self, n):
+        unparsed_json = self.get_following(self.id, n)
+        for match in re.findall("\"id\": \"(\d+)\"", unparsed_json):
+            self.unfollow(match)
+            time.sleep(65)
