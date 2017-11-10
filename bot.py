@@ -25,7 +25,7 @@ INBOX_URL = "https://www.instagram.com/direct_v2/inbox/"
 HASHTAG_URL = "https://www.instagram.com/explore/tags/%s/?__a=1"
 LIKE_URL = "https://www.instagram.com/web/likes/%s/like/"
 COMMENT_URL = "https://www.instagram.com/web/comments/%s/add/"
-FOLLOWING_URL = "https://www.instagram.com/graphql/query/"
+GRAPHQL_QUERY_URL = "https://www.instagram.com/graphql/query/"
 
 class Bot(object):
     def __init__(self, username, password):
@@ -106,16 +106,49 @@ class Bot(object):
         hashtag = self.s.post(HASHTAG_URL % (hashtag))
         return json.loads(hashtag.text)['tag']['media']['nodes']
 
+    # Begin GraphQl Query methods
+    # The id determines what type of data it returns (following, followers, likes)
+    # Try to make sure the n requested is not greater than what actually exists
+    def get_following_count(self, id_):
+        data = {
+            'query_id': 17874545323001329,
+            'variables': '{"id":"%s","first":0}' % id_
+        }
+        raw_text = self.s.post(GRAPHQL_QUERY_URL, data=data).text
+        return json.loads(raw_text)['data']['user']['edge_follow']['count']
+
     def get_following(self, id_, n):
         data = {
-            'query_id': 17874545323001329, # This query ID seems to be valid for getting following for any user, don't know why
-            'variables': "{\"id\":\"%s\",\"first\":%s}" % (id_, n),
+            'query_id': 17874545323001329,
+            'variables': '{"id":"%s","first":%s}' % (id_, n),
         }
-        req = self.s.post(FOLLOWING_URL, data=data)
-        return req.text
+        return self.s.post(GRAPHQL_QUERY_URL, data=data).text
+
+    def get_follower_count(self, id_):
+        data = {
+            'query_id': 17851374694183129,
+            'variables': '{"id":"%s","first":0}' % id_
+        }
+        raw_text = self.s.post(GRAPHQL_QUERY_URL, data=data).text
+        return json.loads(raw_text)['data']['user']['edge_followed_by']['count']
+
+    def get_followers(self, id_, n):
+        data = {
+            'query_id': 17851374694183129,
+            'variables': '{"id":"%s","first":%d}' % (id_, n)
+        }
+        return self.s.post(GRAPHQL_QUERY_URL, data=data).text
+
+    def get_likes_on_photo(self, shortcode, n):
+        data = {
+            'query_id': 17864450716183058,
+            'variables': '{"shortcode":"%s","first":%d}' % (shortcode, n)
+
+        }
+        return self.s.post(GRAPHQL_QUERY_URL, data=data).text
 
     def mass_unfollow(self, n):
         unparsed_json = self.get_following(self.id, n)
         for match in re.findall("\"id\": \"(\d+)\"", unparsed_json):
             self.unfollow(match)
-            time.sleep(65)
+            time.sleep(65)  
