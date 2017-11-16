@@ -21,7 +21,7 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     # parser.add_argument('instruction', type=str)
-    parser.add_argument('--hashtag_type', type=str, default='big_list', help='Options: big_list, surfing, travel')
+    parser.add_argument('--hashtag_type', type=str, default='big_list', help='Options: big_list, surfing, travel, memes')
     parser.add_argument('--delay', type=int, default=120)
     parser.add_argument('--pipe_depth', type=int, default=200)
     parser.add_argument('--number_of_tags', type=int, default=1000)
@@ -49,6 +49,8 @@ def main():
         h = open("resources/surfing_hashtags.txt", "r")
     elif args.hashtag_type == 'travel':
         h = open("resources/travel_hashtags.txt", "r")
+    elif args.hashtag_type == 'memes':
+        h = open("resources/meme_hashtags.txt", "r")
     else:
         raise ValueError('Argument hashtag_type %s invalid.'%args.hashtag_type)
     hashtags = h.readlines()
