@@ -91,7 +91,7 @@ class Bot(object):
 
     def unfollow(self, user_id):
         unfollow = self.s.post(UNFOLLOW_URL % (user_id))
-        self.logger.log_follow("unfollow", user_id, unfollow.text)
+        self.logger.log_follow("unfollow", user_id, unfollow.text, "unfollow_hashtag_placeholder")
 
     def like(self, media_id, originating_hashtag):
         like = self.s.post(LIKE_URL % (media_id))
