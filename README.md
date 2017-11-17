@@ -1,5 +1,5 @@
 ### Instagram Bot V2
-Uses instagram private api, instead of a phantomjs
+Uses instagram private api, instead of phantomjs
 
 ## requirements:
 * python3
