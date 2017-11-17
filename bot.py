@@ -85,21 +85,21 @@ class Bot(object):
             self.logger.log_login(self.username, "auth_error:%d"%login.status.code)
             sys.exit()
 
-    def follow(self, user_id):
+    def follow(self, user_id, originating_hashtag):
         follow = self.s.post(FOLLOW_URL % (user_id))
-        self.logger.log_follow("follow", user_id, follow.text)
+        self.logger.log_follow("follow", user_id, follow.text, originating_hashtag)
 
     def unfollow(self, user_id):
         unfollow = self.s.post(UNFOLLOW_URL % (user_id))
         self.logger.log_follow("unfollow", user_id, unfollow.text)
 
-    def like(self, media_id):
+    def like(self, media_id, originating_hashtag):
         like = self.s.post(LIKE_URL % (media_id))
-        self.logger.log_like("like_photo", media_id, like.text);
+        self.logger.log_like("like_photo", media_id, like.text, originating_hashtag);
 
-    def comment(self, comment_text, media_id):
+    def comment(self, comment_text, media_id, originating_hashtag):
         comment = self.s.post(COMMENT_URL % (media_id), data={"comment_text":comment_text})
-        self.logger.log_comment("write_comment", media_id, comment.text)
+        self.logger.log_comment("write_comment", media_id, comment.text, originating_hashtag)
 
     def get_media_from_hashtag(self, hashtag):
         #scrape a hashtag for a list of media dicts. Keys I need to know: 'id' 'owner':'id'
@@ -151,4 +151,4 @@ class Bot(object):
         unparsed_json = self.get_following(self.id, n)
         for match in re.findall("\"id\": \"(\d+)\"", unparsed_json):
             self.unfollow(match)
-            time.sleep(65)  
+            time.sleep(65)
