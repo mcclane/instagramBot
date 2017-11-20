@@ -55,7 +55,7 @@ def main():
         raise ValueError('Argument hashtag_type %s invalid.'%args.hashtag_type)
     hashtags = h.readlines()
     h.close()
-    
+
     #what the bot will do
     if(args.mass_unfollow != -1):
         print("Starting mass unfollow")
@@ -82,12 +82,12 @@ def run_bot(username, password, delay, pipe_depth, number_of_tags, compliments, 
             media = b.get_media_from_hashtag(tag)
             #iterate through, like all and comment on a few
             for i in range(len(media)):
-                b.like(media[i]['id'])
+                b.like(media[i]['id'], tag)
                 time.sleep(1)
-                if(i == len(media)/2):
-                    b.comment(compliments[randint(0, len(compliments)-1)], media[i]['id'])
+                if(randint(0,9) == 0):
+                    b.comment(compliments[randint(0, len(compliments)-1)], media[i]['id'], tag)
                     time.sleep(1)
-                b.follow(media[i]['owner']['id'])
+                b.follow(media[i]['owner']['id'], tag)
                 time.sleep(1)
                 followed_list.append(media[i]['owner']['id'])
                 rand_delay = randint(delay-5,delay+5)/2
@@ -117,10 +117,10 @@ def run_cycle(username, password, delay, cycle_length, compliments, hashtags):
             media = b.get_media_from_hashtag(tag)
             #iterate through, like all and comment on a few
             for i in range(len(media)):
-                #b.like(media[i]['id'])
+                b.like(media[i]['id'])
                 time.sleep(1)
-                if(i == len(media)/2):
-                    b.comment(compliments[randint(0, len(compliments)-1)], media[i]['id'])
+                if(randint(0,9) == 0):
+                    b.comment(compliments[randint(0, len(compliments)-1)], media[i]['id'], tag)
                     time.sleep(1)
                 b.follow(media[i]['owner']['id'])
                 time.sleep(1)

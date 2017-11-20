@@ -13,9 +13,9 @@ class logger_2:
 
         # Set pandas index's for each log
         self.login_log_index = ['time', 'message']
-        self.follow_log_index = ['time', 'relationship_change', 'user_id', 'follow_text']
-        self.like_log_index = ['time', 'like_change', 'media_id', 'like_text']
-        self.comment_log_index = ['time', 'comment_change', 'media_id', 'comment_text']
+        self.follow_log_index = ['time', 'relationship_change', 'user_id', 'follow_text', 'originating_hashtag']
+        self.like_log_index = ['time', 'like_change', 'media_id', 'like_text', 'hashtag_user_found_on']
+        self.comment_log_index = ['time', 'comment_change', 'media_id', 'comment_text', 'hashtag_user_found_on']
 
         # Set base paths for each log
         self.login_log_path = self.base_path + "login_log.pkl"
@@ -27,16 +27,16 @@ class logger_2:
         entry = [time.time(), message]
         self.add_and_save(self.login_log_path, entry, self.login_log_index)
 
-    def log_follow(self, relationship_change, user_id, follow_text):
-        entry = [time.time(), relationship_change, user_id, follow_text]
+    def log_follow(self, relationship_change, user_id, follow_text, originating_hashtag):
+        entry = [time.time(), relationship_change, user_id, follow_text, originating_hashtag]
         self.add_and_save(self.follow_log_path, entry, self.follow_log_index)
 
-    def log_like(self, like_change, media_id, like_text):
-        entry = [time.time(), like_change, media_id, like_text]
+    def log_like(self, like_change, media_id, like_text, originating_hashtag):
+        entry = [time.time(), like_change, media_id, like_text, originating_hashtag]
         self.add_and_save(self.like_log_path, entry, self.like_log_index)
 
-    def log_comment(self, comment_change, media_id, comment_text):
-        entry = [time.time(), comment_change, media_id, comment_text]
+    def log_comment(self, comment_change, media_id, comment_text, originating_hashtag):
+        entry = [time.time(), comment_change, media_id, comment_text, originating_hashtag]
         self.add_and_save(self.comment_log_path, entry, self.comment_log_index)
 
     def add_and_save(self, path, data, index):
