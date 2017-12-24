@@ -3,6 +3,7 @@ import follower_accounting as fa
 from getpass import getpass
 from random import randint
 import time
+import argparse
 
 '''
 Main runner class that reads in flags and starts the bot. All flags optional:
@@ -18,7 +19,6 @@ Main runner class that reads in flags and starts the bot. All flags optional:
         password: password, if not passed in ask for user input
 '''
 def main():
-    import argparse
     parser = argparse.ArgumentParser()
     # parser.add_argument('instruction', type=str)
     parser.add_argument('--hashtag_type', type=str, default='big_list', help='Options: big_list, surfing, travel, memes')
@@ -141,12 +141,10 @@ def clean(username, password, delay, b=None):
     if(b==None):
         b = Bot(username, password)
     time.sleep(2)
-
-    open_followings = fa.follower_analysis(username)['open_followings']
-
-    for user in open_followings:
-        b.unfollow(user)
-        time.sleep(abs(randint(delay-5, delay+5)))
+    follower_count = b.get_follower_count(b.id)
+    print("Followers: "+str(follower_count))
+    following_count = b.get_following_count(b.id)
+    print("Following: "+str(following_count))
 
 def mass_unfollow(username, password, n):
     b = Bot(username, password)
