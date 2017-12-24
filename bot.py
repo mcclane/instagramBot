@@ -122,7 +122,8 @@ class Bot(object):
             'query_id': 17874545323001329,
             'variables': '{"id":"%s","first":%s}' % (id_, n),
         }
-        return self.s.post(GRAPHQL_QUERY_URL, data=data).text
+        raw_text = self.s.post(GRAPHQL_QUERY_URL, data=data).text
+        return json.loads(raw_text)['data']['user']['edge_follow']['edges']
 
     def get_follower_count(self, id_):
         data = {
@@ -137,7 +138,8 @@ class Bot(object):
             'query_id': 17851374694183129,
             'variables': '{"id":"%s","first":%d}' % (id_, n)
         }
-        return self.s.post(GRAPHQL_QUERY_URL, data=data).text
+        raw_text = self.s.post(GRAPHQL_QUERY_URL, data=data).text
+        return json.loads(raw_text)['data']['user']['edge_followed_by']['edges']
 
     def get_likes_on_photo(self, shortcode, n):
         data = {

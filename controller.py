@@ -30,6 +30,7 @@ def main():
     parser.add_argument('--password', type=str, default=None)
     parser.add_argument('--clean', action='store_true')
     parser.add_argument('--mass_unfollow', type=int, default=-1)
+    parser.add_argument('--WayneWashington', action='store_true')
     args = parser.parse_args()
 
     # Get the resources
@@ -66,6 +67,9 @@ def main():
     elif(args.clean):
         print("starting clean")
         clean(username, password, args.delay)
+    elif(args.WayneWashington):
+        print("starting the wayne washington - no following!")
+        WayneWashington(username, password, args.delay, hashtags, compliments)
     else:
         print("starting pipeline")
         run_bot(username, password, args.delay, args.pipe_depth, args.number_of_tags, compliments, hashtags)
@@ -137,14 +141,48 @@ def run_cycle(username, password, delay, cycle_length, compliments, hashtags):
     #clean up
     clean(username, password, delay, b)
 
-def clean(username, password, delay, b=None):
+def clean(username, password, delay, b=None): # works for only me!
     if(b==None):
         b = Bot(username, password)
+    with open("mcclanewhitelist.txt", "r") as f:
+        whitelist = { line.split(" ")[0] : line.split(" ")[1] for line in f.readlines() }
     time.sleep(2)
     follower_count = b.get_follower_count(b.id)
     print("Followers: "+str(follower_count))
     following_count = b.get_following_count(b.id)
     print("Following: "+str(following_count))
+    followers_list = b.get_followers(b.id, follower_count)
+    following = b.get_following(b.id, following_count)
+    followers = {}
+    for thing in followers_list:
+        followers[thing['node']['id']] = 1
+
+    for thing in following:
+        print(thing)
+        if not thing['node']['id'] in followers:
+            b.unfollow(thing['node']['id'])
+            time.sleep(delay)
+
+def WayneWashington(username, password, delay, hashtags, compliments, b=None):
+    if(b==None):
+        b = Bot(username, password)
+    while(True):
+        try:
+            #get the media for a random hashtag
+            tag = hashtags[randint(0,len(hashtags)-1)].strip()
+            media = b.get_media_from_hashtag(tag)
+            #iterate through, like all and comment on a few
+            for i in range(len(media)):
+                b.like(media[i]['id'], tag)
+                time.sleep(1)
+                if(randint(0,9) == 0):
+                    b.comment(compliments[randint(0, len(compliments)-1)], media[i]['id'], tag)
+                    time.sleep(1)
+                time.sleep(randint(delay-5,delay+5))
+        except Exception as e:
+            print(str(e))
+            time.sleep(delay)
+
 
 def mass_unfollow(username, password, n):
     b = Bot(username, password)
