@@ -18,7 +18,7 @@ Uses instagram private api, instead of phantomjs
 python3 controller.py  --hashtag_type=surfing --number_of_tags=20 --username hoopty --password floopty
 ```
 
-###All arguments:
+### All arguments:
 * hashtag_type : grouping of hashtags to randomly visit posts from
 * delay : time (rough) between each bot action
 * pipe_depth : maximum number of account should follow
