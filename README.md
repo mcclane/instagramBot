@@ -1,5 +1,5 @@
 ### Instagram Bot V2
-Uses instagram private api, instead of phantomjs
+Likes, comments, and follows people on instagram using web requests to instagram's private api.
 
 ## requirements:
 * python3
